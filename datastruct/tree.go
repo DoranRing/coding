@@ -1,6 +1,9 @@
 package datastruct
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Tree 树型ADT
 type Tree interface {
@@ -40,35 +43,35 @@ func (l *LinkedTree) Root() TreeNode {
 }
 
 func (l *LinkedTree) PreorderTraversal() {
-	preorderTraversal(l.root)
+	l.preorderTraversal(l.root)
 	fmt.Printf("\n")
 }
 
-func preorderTraversal(treeNode TreeNode) {
+func (l *LinkedTree) preorderTraversal(treeNode TreeNode) {
 	fmt.Printf("%d,", treeNode.Val())
 	if treeNode.Children() != nil && len(treeNode.Children()) > 0 {
 		for _, val := range treeNode.Children() {
-			preorderTraversal(val)
+			l.preorderTraversal(val)
 		}
 	}
 }
 
 func (l *LinkedTree) PostorderTraversal() {
-	postorderTraversal(l.root)
+	l.postorderTraversal(l.root)
 	fmt.Printf("\n")
 }
 
-func postorderTraversal(treeNode TreeNode) {
+func (l *LinkedTree) postorderTraversal(treeNode TreeNode) {
 	if treeNode.Children() != nil && len(treeNode.Children()) > 0 {
 		for _, val := range treeNode.Children() {
-			preorderTraversal(val)
+			l.preorderTraversal(val)
 		}
 	}
 	fmt.Printf("%d,", treeNode.Val())
 }
 
-func NewLinkedTree(root TreeNode) *LinkedTree {
-	return &LinkedTree{root: root}
+func NewLinkedTree(val int) *LinkedTree {
+	return &LinkedTree{root: NewLinkedTreeNode(val)}
 }
 
 // LinkedTreeNode 链式结构的树型节点实现
@@ -127,4 +130,291 @@ func (l *LinkedTreeNode) DeleteChild(treeNode TreeNode) {
 			l.children = append(l.children[:k], l.children[k+1:]...)
 		}
 	}
+}
+
+// BinaryTree 二叉树ADT
+type BinaryTree interface {
+	Root() BinaryTreeNode
+
+	// MakeEmpty 清空
+	MakeEmpty()
+
+	// IsEmpty 检查为空
+	IsEmpty() bool
+
+	// Contains 包含值
+	Contains(val int) bool
+
+	Find(val int) BinaryTreeNode
+
+	// FindMax 查询最大值
+	FindMax() (int, error)
+
+	// FindMin 查询最小值
+	FindMin() (int, error)
+
+	// Insert 新增值
+	Insert(val int)
+
+	// 删除值
+	Remove(val int)
+
+	// Contains 包含值
+	ContainsByNode(val int, treeNode BinaryTreeNode) bool
+
+	// FindMax 查询最大值
+	FindMaxByNode(treeNode BinaryTreeNode) (int, error)
+
+	// FindMin 查询最小值
+	FindMinByNode(treeNode BinaryTreeNode) (int, error)
+
+	// Insert 新增值
+	InsertByNode(val int, treeNode BinaryTreeNode)
+
+	// 删除值
+	RemoveByNode(val int, treeNode BinaryTreeNode)
+
+	// PreorderTraversal 前序遍历
+	PreorderTraversal()
+
+	// InorderTraversal 中序遍历
+	InorderTraversal()
+
+	// PostorderTraversal 后序遍历
+	PostorderTraversal()
+}
+
+// BinaryTreeNode 二叉树节点
+type BinaryTreeNode interface {
+	Val() int
+
+	SetVal(val int)
+
+	Left() BinaryTreeNode
+
+	SetLeft(treeNode BinaryTreeNode)
+
+	Right() BinaryTreeNode
+
+	SetRight(treeNode BinaryTreeNode)
+}
+
+type LinkedBinaryTree struct {
+	root BinaryTreeNode
+}
+
+func NewLinkedBinaryTree(val int) *LinkedBinaryTree {
+	return &LinkedBinaryTree{root: NewLinkedBinaryTreeNode(val)}
+}
+
+func (l *LinkedBinaryTree) Root() BinaryTreeNode {
+	return l.root
+}
+
+func (l *LinkedBinaryTree) MakeEmpty() {
+	l.root = nil
+}
+
+func (l *LinkedBinaryTree) IsEmpty() bool {
+	return l.root == nil
+}
+
+func (l *LinkedBinaryTree) Contains(val int) bool {
+	return l.find(l.Root(), val) != nil
+}
+
+func (l *LinkedBinaryTree) Find(val int) BinaryTreeNode {
+	return l.find(l.root, val)
+}
+
+func (l *LinkedBinaryTree) find(treeNode BinaryTreeNode, val int) BinaryTreeNode {
+	if treeNode == nil {
+		return nil
+	}
+	if treeNode.Val() == val {
+		return treeNode
+	} else if treeNode.Val() > val {
+		return l.find(treeNode.Left(), val)
+	} else {
+		return l.find(treeNode.Right(), val)
+	}
+}
+
+func (l *LinkedBinaryTree) FindMax() (int, error) {
+	if l.root == nil {
+		return 0, errors.New("tree is null")
+	}
+	return l.findMax(l.root), nil
+}
+
+func (l *LinkedBinaryTree) findMax(treeNode BinaryTreeNode) int {
+	if treeNode.Right() == nil {
+		return treeNode.Val()
+	}
+	return l.findMax(treeNode.Right())
+}
+
+func (l *LinkedBinaryTree) FindMin() (int, error) {
+	if l.IsEmpty() {
+		return 0, errors.New("tree is null")
+	}
+	return l.findMin(l.root), nil
+}
+
+func (l *LinkedBinaryTree) findMin(treeNode BinaryTreeNode) int {
+	if treeNode.Left() == nil {
+		return treeNode.Val()
+	}
+	return l.findMin(treeNode.Left())
+}
+
+func (l *LinkedBinaryTree) Insert(val int) {
+	if l.root == nil {
+		l.root = NewLinkedBinaryTreeNode(val)
+	} else {
+		l.insert(l.root, val)
+	}
+}
+
+func (l *LinkedBinaryTree) insert(treeNode BinaryTreeNode, val int) BinaryTreeNode {
+	if treeNode == nil {
+		return NewLinkedBinaryTreeNode(val)
+	}
+	if treeNode.Val() > val {
+		treeNode.SetLeft(l.insert(treeNode.Left(), val))
+	} else if treeNode.Val() < val {
+		treeNode.SetRight(l.insert(treeNode.Right(), val))
+	}
+	return treeNode
+}
+
+func (l *LinkedBinaryTree) Remove(val int) {
+	if l.root == nil {
+		return
+	}
+
+	l.root = l.remove(l.root, val)
+}
+
+func (l *LinkedBinaryTree) remove(treeNode BinaryTreeNode, val int) BinaryTreeNode {
+	if treeNode == nil {
+		return treeNode
+	}
+	if treeNode.Val() > val {
+		treeNode.SetLeft(l.remove(treeNode.Left(), val))
+	} else if treeNode.Val() < val {
+		treeNode.SetRight(l.remove(treeNode.Right(), val))
+	} else if treeNode.Left() != nil && treeNode.Right() != nil {
+		treeNode.SetVal(l.findMin(treeNode.Right()))
+		treeNode.SetRight(l.remove(treeNode.Right(), treeNode.Val()))
+	} else {
+		if treeNode.Left() != nil {
+			return treeNode.Left()
+		} else {
+			return treeNode.Right()
+		}
+	}
+	return treeNode
+}
+
+func (l *LinkedBinaryTree) ContainsByNode(val int, treeNode BinaryTreeNode) bool {
+	return l.find(treeNode, val) != nil
+}
+
+func (l *LinkedBinaryTree) FindMaxByNode(treeNode BinaryTreeNode) (int, error) {
+	if treeNode == nil {
+		return 0, errors.New("element is null")
+	}
+	return l.findMax(treeNode), nil
+}
+
+func (l *LinkedBinaryTree) FindMinByNode(treeNode BinaryTreeNode) (int, error) {
+	if treeNode == nil {
+		return 0, errors.New("element is null")
+	}
+	return l.findMin(treeNode), nil
+}
+
+func (l *LinkedBinaryTree) InsertByNode(val int, treeNode BinaryTreeNode) {
+	if treeNode == nil {
+		return
+	}
+	l.insert(treeNode, val)
+}
+
+func (l *LinkedBinaryTree) RemoveByNode(val int, treeNode BinaryTreeNode) {
+	l.remove(treeNode, val)
+}
+
+func (l *LinkedBinaryTree) PreorderTraversal() {
+	l.preorderTraversalBinary(l.root)
+}
+
+func (l *LinkedBinaryTree) preorderTraversalBinary(treeNode BinaryTreeNode) {
+	if treeNode == nil {
+		return
+	}
+	fmt.Printf("%d,", treeNode.Val())
+	l.preorderTraversalBinary(treeNode.Left())
+	l.preorderTraversalBinary(treeNode.Right())
+}
+
+func (l *LinkedBinaryTree) InorderTraversal() {
+	l.inorderTraversalBinary(l.root)
+}
+
+func (l *LinkedBinaryTree) inorderTraversalBinary(treeNode BinaryTreeNode) {
+	if treeNode == nil {
+		return
+	}
+	l.inorderTraversalBinary(treeNode.Left())
+	fmt.Printf("%d,", treeNode.Val())
+	l.inorderTraversalBinary(treeNode.Right())
+}
+
+func (l *LinkedBinaryTree) PostorderTraversal() {
+	l.postorderTraversalBinary(l.root)
+}
+
+func (l *LinkedBinaryTree) postorderTraversalBinary(treeNode BinaryTreeNode) {
+	if treeNode == nil {
+		return
+	}
+	l.postorderTraversalBinary(treeNode.Left())
+	fmt.Printf("%d,", treeNode.Val())
+	l.postorderTraversalBinary(treeNode.Right())
+}
+
+type LinkedBinaryTreeNode struct {
+	val   int
+	left  BinaryTreeNode
+	right BinaryTreeNode
+}
+
+func (l *LinkedBinaryTreeNode) SetVal(val int) {
+	l.val = val
+}
+
+func (l *LinkedBinaryTreeNode) Val() int {
+	return l.val
+}
+
+func (l *LinkedBinaryTreeNode) Left() BinaryTreeNode {
+	return l.left
+}
+
+func (l *LinkedBinaryTreeNode) SetLeft(treeNode BinaryTreeNode) {
+	l.left = treeNode
+}
+
+func (l *LinkedBinaryTreeNode) Right() BinaryTreeNode {
+	return l.right
+}
+
+func (l *LinkedBinaryTreeNode) SetRight(treeNode BinaryTreeNode) {
+	l.right = treeNode
+}
+
+func NewLinkedBinaryTreeNode(val int) *LinkedBinaryTreeNode {
+	return &LinkedBinaryTreeNode{val: val}
 }
