@@ -18,8 +18,8 @@ func Test_hammingWeight(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := hammingWeight(tt.args.num); got != tt.want {
-				t.Errorf("hammingWeight() = %v, want %v", got, tt.want)
+			if got := hammingWeightByMath(tt.args.num); got != tt.want {
+				t.Errorf("hammingWeightByMath() = %v, want %v", got, tt.want)
 			}
 		})
 	}
