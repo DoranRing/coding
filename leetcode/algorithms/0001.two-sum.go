@@ -1,5 +1,18 @@
 package algorithms
 
+// 暴力方式
+// time: O(n2) space:O(1)
+func twoSumByForce(nums []int, target int) []int {
+	for i := 0; i < len(nums); i++ {
+		for j := 0; j < len(nums); j++ {
+			if nums[i]+nums[j] == target && i != j {
+				return []int{i, j}
+			}
+		}
+	}
+	return []int{}
+}
+
 // 通过哈希表记录出现过的元素以及下标，后面元素在哈希表中寻找符合要求的特定元素，找到则返回结果
 // time:O(n) space:O(n)
 // 执行用时: 4 ms 内存消耗: 3 MB
