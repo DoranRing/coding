@@ -14,6 +14,9 @@ type Tree interface {
 
 	// PostorderTraversal 后序遍历
 	PostorderTraversal()
+
+	// LevelOrderTraversal 层序遍历
+	LevelOrderTraversal()
 }
 
 // TreeNode 树型节点ADT
@@ -68,6 +71,35 @@ func (l *LinkedTree) postorderTraversal(treeNode TreeNode) {
 		}
 	}
 	fmt.Printf("%d,", treeNode.Val())
+}
+
+func (l *LinkedTree) LevelOrderTraversal() {
+	queue := make([]TreeNode, 0, 0)
+	var first TreeNode
+	if l.root != nil {
+		queue = append(queue, l.root)
+		first = l.root
+	}
+	for len(queue) > 0 {
+		top := queue[0]
+		queue = queue[1:]
+		if top == first {
+			fmt.Printf("\na level: ")
+			first = nil
+		}
+		fmt.Printf("%d,", top.Val())
+		if top.Children() == nil {
+			continue
+		}
+		for _, treeNode := range top.Children() {
+			if treeNode != nil && first == nil {
+				first = treeNode
+			}
+			queue = append(queue, treeNode)
+		}
+	}
+	fmt.Printf("\n")
+
 }
 
 func NewLinkedTree(val int) *LinkedTree {

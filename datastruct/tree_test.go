@@ -42,6 +42,7 @@ func TestLinkedTree_Traversal(t *testing.T) {
 	firstChildren.AddChildren(30)
 	tree.PreorderTraversal()
 	tree.PostorderTraversal()
+	tree.LevelOrderTraversal()
 }
 
 func TestNewLinkedBinaryTree(t *testing.T) {
