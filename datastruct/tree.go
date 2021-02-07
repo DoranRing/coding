@@ -214,6 +214,9 @@ type BinaryTree interface {
 
 	// PostorderTraversal 后序遍历
 	PostorderTraversal()
+
+	// LevelOrderTraversal 层序遍历
+	LevelOrderTraversal()
 }
 
 // BinaryTreeNode 二叉树节点
@@ -415,6 +418,37 @@ func (l *LinkedBinaryTree) postorderTraversalBinary(treeNode BinaryTreeNode) {
 	l.postorderTraversalBinary(treeNode.Left())
 	fmt.Printf("%d,", treeNode.Val())
 	l.postorderTraversalBinary(treeNode.Right())
+}
+
+func (l *LinkedBinaryTree) LevelOrderTraversal() {
+	queue := make([]BinaryTreeNode, 0, 0)
+	var first BinaryTreeNode
+	if l.root != nil {
+		queue = append(queue, l.root)
+		first = l.root
+	}
+	for len(queue) > 0 {
+		top := queue[0]
+		queue = queue[1:]
+		if top == first {
+			fmt.Printf("\na level: ")
+			first = nil
+		}
+		fmt.Printf("%d,", top.Val())
+		if top.Left() != nil {
+			queue = append(queue, top.Left())
+			if first == nil {
+				first = top
+			}
+		}
+		if top.Right() != nil {
+			queue = append(queue, top.Right())
+			if first == nil {
+				first = top
+			}
+		}
+	}
+	fmt.Printf("\n")
 }
 
 type LinkedBinaryTreeNode struct {
