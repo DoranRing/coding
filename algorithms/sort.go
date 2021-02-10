@@ -150,3 +150,21 @@ func quickSorter(nums []int, left, right int) {
 	quickSorter(nums, left, refIdx-1)
 	quickSorter(nums, refIdx+1, right)
 }
+
+// BucketSorter 桶排序(稳定排序)
+// time:O(m+n),space:O(m)
+func BucketSorter(nums []int, max int) {
+	bucket := make([]int, max+1, max+1)
+	for _, num := range nums {
+		bucket[num]++
+	}
+
+	idx := 0
+	for i := 0; i < len(bucket); i++ {
+		for bucket[i] > 0 {
+			nums[idx] = i
+			idx++
+			bucket[i]--
+		}
+	}
+}
