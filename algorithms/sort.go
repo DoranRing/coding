@@ -1,7 +1,6 @@
 package algorithms
 
-// BubbleSorter 冒泡排序
-// 稳定排序
+// BubbleSorter 冒泡排序(稳定排序)
 // time:O(n2), space:O(1)
 func BubbleSorter(nums []int) {
 	for i := 0; i < len(nums); i++ {
@@ -13,8 +12,7 @@ func BubbleSorter(nums []int) {
 	}
 }
 
-// SelectSorter 选择排序
-// 稳定排序
+// SelectSorter 选择排序(稳定排序)
 // time:O(n2), space:O(1)
 func SelectSorter(nums []int) {
 	for i := 0; i < len(nums); i++ {
@@ -28,8 +26,7 @@ func SelectSorter(nums []int) {
 	}
 }
 
-// InsertSorter 插入排序
-// 稳定排序
+// InsertSorter 插入排序(稳定排序)
 // time:O(n2), space:O(1)
 func InsertSorter(nums []int) {
 	for i := 1; i < len(nums); i++ {
@@ -42,16 +39,20 @@ func InsertSorter(nums []int) {
 	}
 }
 
-// ShellSorter 希尔排序
-// 不稳定排序
+// ShellSorter 希尔排序(不稳定排序)
 // time:O(n1.3-2), space:O(1)
 func ShellSorter(nums []int) {
 	step := len(nums) / 2
 	for step > 0 {
+		// 每组分别排序
 		for i := 0; i < step; i++ {
-			for j := i; j < len(nums)-step; j = j + step {
-				if nums[j] > nums[j+step] {
-					nums[j], nums[j+step] = nums[j+step], nums[j]
+			// 插入排序
+			for j := i; j < len(nums); j += step {
+				for k := j; k >= step; k -= step {
+					if nums[k] >= nums[k-step] {
+						break
+					}
+					nums[k], nums[k-step] = nums[k-step], nums[k]
 				}
 			}
 		}
@@ -59,11 +60,10 @@ func ShellSorter(nums []int) {
 	}
 }
 
-// MergeSorter 归并排序
-// 稳定排序
+// MergeSorter 归并排序(稳定排序)
 // time:O(n*logN), space:O(n)
 func MergeSorter(nums []int) {
-	if len(nums) == 0 {
+	if len(nums) <= 1 {
 		return
 	}
 	temp := make([]int, len(nums), len(nums))
@@ -110,4 +110,43 @@ func merge(nums, temp []int, l1, l2, r2 int) {
 	for i := l1; i <= r2; i++ {
 		nums[i] = temp[i]
 	}
+}
+
+// QuickSorter 快速排序
+// time:O(n*longN), space:O(1)
+func QuickSorter(nums []int) {
+	if len(nums) <= 1 {
+		return
+	}
+	quickSorter(nums, 0, len(nums)-1)
+}
+
+func quickSorter(nums []int, left, right int) {
+	if left >= right {
+		return
+	}
+
+	refVal, refIdx := nums[left], left
+	for i, j := 0, len(nums)-1; i <= j; {
+		// 小于值向前移动
+		for j >= refIdx && nums[j] >= refVal {
+			j--
+		}
+		if j >= refIdx {
+			nums[refIdx] = nums[j]
+			refIdx = j
+		}
+		// 大于值向后移动
+		for i <= refIdx && nums[i] <= refVal {
+			i++
+		}
+		if i <= refIdx {
+			nums[refIdx] = nums[i]
+			refIdx = i
+		}
+	}
+
+	nums[refIdx] = refVal
+	quickSorter(nums, left, refIdx-1)
+	quickSorter(nums, refIdx+1, right)
 }
