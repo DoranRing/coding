@@ -1,13 +1,13 @@
 package algorithms
 
-// BinarySearch 二分查找
-func BinarySearch(nums []int, val int) int {
+// 执行用时: 32 ms 内存消耗: 6.7 MB
+func BinarySearch(nums []int, target int) int {
 	left, right := 0, len(nums)-1
 	for left <= right {
 		mid := (left + right) / 2
-		if nums[mid] == val {
+		if nums[mid] == target {
 			return mid
-		} else if nums[mid] > val {
+		} else if nums[mid] > target {
 			right = mid - 1
 		} else {
 			left = mid + 1
