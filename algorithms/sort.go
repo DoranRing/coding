@@ -178,7 +178,7 @@ func BucketSorter(nums []int, max int) {
 type HardList struct {
 
 	// 文件路径
-	FilePath string
+	filePath string
 
 	// 线性表的长度
 	len int
@@ -187,23 +187,29 @@ type HardList struct {
 	f *os.File
 }
 
-func NewHardList(filePath string) *HardList {
-	list := &HardList{FilePath: filePath}
+func NewHardList(filePath string, len int) *HardList {
+	list := &HardList{filePath: filePath}
 	list.Open()
+	list.init(len)
 	return list
 }
 
 func DefaultHardList() *HardList {
-	return NewHardList("hard_data")
+	return NewHardList("hard_data", 0)
 }
 
 // Open 打开磁盘文件
 func (h *HardList) Open() {
-	f, err := os.Create(h.FilePath)
+	h.f = h.openFile(h.filePath)
+}
+
+// openFile 打开磁盘文件
+func (h *HardList) openFile(filePath string) *os.File {
+	f, err := os.Create(filePath)
 	if err != nil {
 		log.Fatalf("open file error: %s\n", err.Error())
 	}
-	h.f = f
+	return f
 }
 
 // Close 关闭线性表
@@ -222,6 +228,17 @@ func (h *HardList) Len() int {
 	return h.len
 }
 
+func (h *HardList) init(len int) {
+	h.len = len
+	if len <= 0 {
+		return
+	}
+	_, err := h.f.WriteAt([]byte{0}, int64(len*4-1))
+	if err != nil {
+		log.Fatalf("init error: %s\n", err.Error())
+	}
+}
+
 // Get 获取指定索引的数据
 func (h *HardList) Get(idx int) int32 {
 	if idx >= h.len {
@@ -235,6 +252,17 @@ func (h *HardList) Get(idx int) int32 {
 	return h.byteMapInt(data, 0)
 }
 
+// gets 获取一块数据
+func (h *HardList) gets(idx int, buf []byte) {
+	if idx >= h.len {
+		log.Fatalf("outbound index. len:%d,idx:%d\n", h.len, idx)
+	}
+	size, err := h.f.ReadAt(buf, int64(idx*4))
+	if size == 0 && err != nil {
+		log.Fatalf("read file error: %s\n", err.Error())
+	}
+}
+
 // Set 设置指定索引的数据
 func (h *HardList) Set(idx int, num int32) {
 	if idx >= h.len {
@@ -242,6 +270,14 @@ func (h *HardList) Set(idx int, num int32) {
 	}
 	data := h.intMapByte(num)
 	h.writeDate(data, int64(idx*4))
+}
+
+// sets 设置一块数据
+func (h *HardList) sets(idx int, buf []byte) {
+	if idx >= h.len {
+		log.Fatalf("outbound index. len:%d,idx:%d\n", h.len, idx)
+	}
+	h.writeDate(buf, int64(idx*4))
 }
 
 // Append 线性表尾部添加元素
@@ -313,7 +349,76 @@ func (h *HardList) byteMapInt(nums []byte, idx int) int32 {
 		int32(nums[idx+3])
 }
 
-// MemorySorter 内存内排序
+// BubbleSort 使用冒泡排序排序所有元素
+func (h *HardList) BubbleSort() {
+	for i := 0; i < h.len; i++ {
+		for j := 0; j < h.len-i-1; j++ {
+			if h.Get(j) > h.Get(j+1) {
+				cur := h.Get(j)
+				next := h.Get(j + 1)
+				h.Set(j, next)
+				h.Set(j+1, cur)
+			}
+		}
+	}
+}
+
+// MergeSort 归并排序
+// 磁盘具备随机读取功能，所有只需要1*n的额外空间
+// 磁带不具备随机读取功能，所以需要多个额外空间
+func (h *HardList) MergeSort() {
+	if h.len <= 1 {
+		return
+	}
+	tempFileName := h.filePath + ".temp"
+	tempList := NewHardList(tempFileName, h.len)
+	h.mergeSort(tempList, 0, h.len-1)
+}
+
+func (h *HardList) mergeSort(tempList *HardList, left, right int) {
+	if left == right {
+		return
+	} else if left+1 == right {
+		h.merge(tempList, left, right, right)
+	} else {
+		mid := (left + right) / 2
+		h.mergeSort(tempList, left, mid)
+		h.mergeSort(tempList, mid+1, right)
+		h.merge(tempList, left, mid+1, right)
+	}
+}
+
+func (h *HardList) merge(tempList *HardList, aLeft, bLeft, bRight int) {
+	aRight := bLeft - 1
+	left, idx := aLeft, aLeft
+	for aLeft <= aRight && bLeft <= bRight {
+		aVal := h.Get(aLeft)
+		bVal := h.Get(bLeft)
+		if aVal < bVal {
+			tempList.Set(idx, aVal)
+			idx, aLeft = idx+1, aLeft+1
+		} else {
+			tempList.Set(idx, bVal)
+			idx, bLeft = idx+1, bLeft+1
+		}
+	}
+	for aLeft <= aRight {
+		tempList.Set(idx, h.Get(aLeft))
+		idx, aLeft = idx+1, aLeft+1
+	}
+	for bLeft <= bRight {
+		tempList.Set(idx, h.Get(bLeft))
+		idx, bLeft = idx+1, bLeft+1
+	}
+
+	// copy
+	for i := left; i <= bRight; i++ {
+		h.Set(i, tempList.Get(i))
+	}
+
+}
+
+// MemorySorter 基于内存的冒泡排序
 func MemorySorter(nums []int32) {
 	for i := 0; i < len(nums); i++ {
 		for j := 0; j < len(nums)-i-1; j++ {
@@ -324,33 +429,36 @@ func MemorySorter(nums []int32) {
 	}
 }
 
-// HardSorter 磁盘内排序
+// HardSorter 基于磁盘的冒泡排序
 func HardSorter(nums []int32) {
 	hardList := DefaultHardList()
 	defer hardList.Close()
 	hardList.AppendList(nums)
-	hardSorter(hardList)
+	hardList.BubbleSort()
 }
 
-// HardSorterValid 测试磁盘内排序
-func HardSorterValid(nums []int32) []int32 {
+// HardBubbleSorterValid 测试基于磁盘的冒泡排序
+func HardBubbleSorterValid(nums []int32) []int32 {
 	hardList := DefaultHardList()
 	defer hardList.Close()
 	hardList.AppendList(nums)
-	hardSorter(hardList)
+	hardList.BubbleSort()
 	return hardList.All()
 }
 
-// hardSorter 磁盘内排序
-func hardSorter(hardList *HardList) {
-	for i := 0; i < hardList.len; i++ {
-		for j := 0; j < hardList.len-i-1; j++ {
-			if hardList.Get(j) > hardList.Get(j+1) {
-				cur := hardList.Get(j)
-				next := hardList.Get(j + 1)
-				hardList.Set(j, next)
-				hardList.Set(j+1, cur)
-			}
-		}
-	}
+// HardBubbleSorterValid 基于磁盘的归并排序
+func HardMergeSorter(nums []int32) {
+	hardList := DefaultHardList()
+	defer hardList.Close()
+	hardList.AppendList(nums)
+	hardList.MergeSort()
+}
+
+// HardBubbleSorterValid 测试基于磁盘的归并排序
+func HardMergeSorterValid(nums []int32) []int32 {
+	hardList := DefaultHardList()
+	defer hardList.Close()
+	hardList.AppendList(nums)
+	hardList.MergeSort()
+	return hardList.All()
 }

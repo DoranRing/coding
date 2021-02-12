@@ -196,9 +196,9 @@ func TestHardList(t *testing.T) {
 	}
 }
 
-func TestHardSorter(t *testing.T) {
+func TestHardBubbleSorterValid(t *testing.T) {
 	nums := genInt32Nums(1000, 1000*100)
-	sortedNums := HardSorterValid(nums)
+	sortedNums := HardBubbleSorterValid(nums)
 	if !sortedInt32(sortedNums) {
 		t.Errorf("not sorted")
 	}
@@ -217,5 +217,21 @@ func BenchmarkHardSorter(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		nums := genInt32Nums(1000, 1000*100)
 		HardSorter(nums)
+	}
+}
+
+// 150286186 ns/op
+func TestHardMergeSorterValid(t *testing.T) {
+	nums := genInt32Nums(1000, 1000*100)
+	sortedNums := HardMergeSorterValid(nums)
+	if !sortedInt32(sortedNums) {
+		t.Errorf("not sorted")
+	}
+}
+
+func BenchmarkHardMergeSorter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		nums := genInt32Nums(1000, 1000*100)
+		HardMergeSorter(nums)
 	}
 }
