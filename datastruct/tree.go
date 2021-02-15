@@ -9,13 +9,13 @@ import (
 type Tree interface {
 	Root() TreeNode
 
-	// PreorderTraversal 前序遍历
+	// PreorderTraversal 前序遍历(深度优先遍历之一)
 	PreorderTraversal()
 
-	// PostorderTraversal 后序遍历
+	// PostorderTraversal 后序遍历(深度优先遍历之一)
 	PostorderTraversal()
 
-	// LevelOrderTraversal 层序遍历
+	// LevelOrderTraversal 层序遍历(广度优先遍历之一)
 	LevelOrderTraversal()
 }
 
@@ -51,6 +51,9 @@ func (l *LinkedTree) PreorderTraversal() {
 }
 
 func (l *LinkedTree) preorderTraversal(treeNode TreeNode) {
+	if treeNode == nil {
+		return
+	}
 	fmt.Printf("%d,", treeNode.Val())
 	if treeNode.Children() != nil && len(treeNode.Children()) > 0 {
 		for _, val := range treeNode.Children() {
@@ -65,6 +68,9 @@ func (l *LinkedTree) PostorderTraversal() {
 }
 
 func (l *LinkedTree) postorderTraversal(treeNode TreeNode) {
+	if treeNode == nil {
+		return
+	}
 	if treeNode.Children() != nil && len(treeNode.Children()) > 0 {
 		for _, val := range treeNode.Children() {
 			l.preorderTraversal(val)
@@ -75,26 +81,17 @@ func (l *LinkedTree) postorderTraversal(treeNode TreeNode) {
 
 func (l *LinkedTree) LevelOrderTraversal() {
 	queue := make([]TreeNode, 0, 0)
-	var first TreeNode
 	if l.root != nil {
 		queue = append(queue, l.root)
-		first = l.root
 	}
 	for len(queue) > 0 {
 		top := queue[0]
 		queue = queue[1:]
-		if top == first {
-			fmt.Printf("\na level: ")
-			first = nil
-		}
 		fmt.Printf("%d,", top.Val())
 		if top.Children() == nil {
 			continue
 		}
 		for _, treeNode := range top.Children() {
-			if treeNode != nil && first == nil {
-				first = treeNode
-			}
 			queue = append(queue, treeNode)
 		}
 	}
@@ -335,6 +332,7 @@ func (l *LinkedBinaryTree) remove(treeNode BinaryTreeNode, val int) BinaryTreeNo
 	if treeNode == nil {
 		return treeNode
 	}
+	//
 	if treeNode.Val() > val {
 		treeNode.SetLeft(l.remove(treeNode.Left(), val))
 	} else if treeNode.Val() < val {
@@ -422,30 +420,18 @@ func (l *LinkedBinaryTree) postorderTraversalBinary(treeNode BinaryTreeNode) {
 
 func (l *LinkedBinaryTree) LevelOrderTraversal() {
 	queue := make([]BinaryTreeNode, 0, 0)
-	var first BinaryTreeNode
 	if l.root != nil {
 		queue = append(queue, l.root)
-		first = l.root
 	}
 	for len(queue) > 0 {
 		top := queue[0]
 		queue = queue[1:]
-		if top == first {
-			fmt.Printf("\na level: ")
-			first = nil
-		}
 		fmt.Printf("%d,", top.Val())
 		if top.Left() != nil {
 			queue = append(queue, top.Left())
-			if first == nil {
-				first = top
-			}
 		}
 		if top.Right() != nil {
 			queue = append(queue, top.Right())
-			if first == nil {
-				first = top
-			}
 		}
 	}
 	fmt.Printf("\n")
