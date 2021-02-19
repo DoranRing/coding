@@ -169,7 +169,7 @@ func BenchmarkBucketSorter(b *testing.B) {
 
 func TestHardList(t *testing.T) {
 	hardList := DefaultHardList()
-	defer hardList.Close()
+	defer hardList.Destroy()
 	var num1 int32 = 20
 	var num2 int32 = 21
 	hardList.Append(num1)

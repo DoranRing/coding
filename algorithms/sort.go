@@ -1,6 +1,7 @@
 package algorithms
 
 import (
+	"bytes"
 	"log"
 	"os"
 )
@@ -212,17 +213,6 @@ func (h *HardList) openFile(filePath string) *os.File {
 	return f
 }
 
-// Close 关闭线性表
-func (h *HardList) Close() {
-	if h.f == nil {
-		return
-	}
-	err := h.f.Close()
-	if err != nil {
-		log.Fatalf("close file error: %s\n", err.Error())
-	}
-}
-
 // Len 线性表长度
 func (h *HardList) Len() int {
 	return h.len
@@ -236,6 +226,17 @@ func (h *HardList) init(len int) {
 	_, err := h.f.WriteAt([]byte{0}, int64(len*4-1))
 	if err != nil {
 		log.Fatalf("init error: %s\n", err.Error())
+	}
+}
+
+func (h *HardList) Destroy() {
+	err := h.f.Close()
+	if err != nil {
+		log.Fatalf("close file(%s) error: %s", h.filePath, err.Error())
+	}
+	err = os.Remove(h.filePath)
+	if err != nil {
+		log.Fatalf("remove file(%s) error: %s", h.filePath, err.Error())
 	}
 }
 
@@ -268,7 +269,7 @@ func (h *HardList) Set(idx int, num int32) {
 	if idx >= h.len {
 		log.Fatalf("outbound index, idx: %d, len: %d\n", idx, h.len)
 	}
-	data := h.intMapByte(num)
+	data := h.mapByte(num)
 	h.writeDate(data, int64(idx*4))
 }
 
@@ -282,24 +283,18 @@ func (h *HardList) sets(idx int, buf []byte) {
 
 // Append 线性表尾部添加元素
 func (h *HardList) Append(num int32) {
-	data := h.intMapByte(num)
+	data := h.mapByte(num)
 	h.writeDate(data, int64(h.len*4))
 	h.len++
 }
 
 // AppendList 线性表尾部批量添加元素
 func (h *HardList) AppendList(nums []int32) {
-	data := make([]byte, 0, 4*len(nums))
+	var buf bytes.Buffer
 	for _, num := range nums {
-		data = append(
-			data,
-			byte(num>>24),     // 0-7 bit
-			byte(num<<8>>24),  // 8-15 bit
-			byte(num<<16>>24), // 16-23 bit
-			byte(num))         // 24-31bit
+		h.appendByte(&buf, num)
 	}
-
-	h.writeDate(data, int64(h.len*4))
+	h.writeDate(buf.Bytes(), int64(h.len*4))
 	h.len += len(nums)
 }
 
@@ -328,21 +323,27 @@ func (h *HardList) writeDate(data []byte, offset int64) {
 	}
 }
 
-// intMapByte int转换成byte[]
-func (h *HardList) intMapByte(num int32) []byte {
-	data := make([]byte, 0)
-	data = append(
-		data,
-		byte(num>>24),     // 0-7 bit
-		byte(num<<8>>24),  // 8-15 bit
-		byte(num<<16>>24), // 16-23 bit
-		byte(num))         // 24-31bit
+// mapByte int转换成byte[]
+func (h *HardList) mapByte(num int32) []byte {
+	return []byte{
+		byte(num >> 24),       // 0-7 bit
+		byte(num << 8 >> 24),  // 8-15 bit
+		byte(num << 16 >> 24), // 16-23 bit
+		byte(num),             // 24-31 bit
+	}
+}
 
-	return data
+// appendByte int转换成byte后填充到尾部
+func (h *HardList) appendByte(buf *bytes.Buffer, num int32) {
+	buf.WriteByte(byte(num >> 24))       // 0-7 bit
+	buf.WriteByte(byte(num << 8 >> 24))  // 8-15 bit
+	buf.WriteByte(byte(num << 16 >> 24)) // 16-23 bit
+	buf.WriteByte(byte(num))             // 24-31 bit
 }
 
 // byteMapInt byte[]转换成int
 func (h *HardList) byteMapInt(nums []byte, idx int) int32 {
+	// |0-7 bit|8-15 bit|16-23 bit|24-31 bit|
 	return int32(nums[idx])<<24 |
 		int32(nums[idx+1])<<16 |
 		int32(nums[idx+2])<<8 |
@@ -372,6 +373,7 @@ func (h *HardList) MergeSort() {
 	}
 	tempFileName := h.filePath + ".temp"
 	tempList := NewHardList(tempFileName, h.len)
+	defer tempList.Destroy()
 	h.mergeSort(tempList, 0, h.len-1)
 }
 
@@ -432,7 +434,7 @@ func MemorySorter(nums []int32) {
 // HardSorter 基于磁盘的冒泡排序
 func HardSorter(nums []int32) {
 	hardList := DefaultHardList()
-	defer hardList.Close()
+	defer hardList.Destroy()
 	hardList.AppendList(nums)
 	hardList.BubbleSort()
 }
@@ -440,7 +442,7 @@ func HardSorter(nums []int32) {
 // HardBubbleSorterValid 测试基于磁盘的冒泡排序
 func HardBubbleSorterValid(nums []int32) []int32 {
 	hardList := DefaultHardList()
-	defer hardList.Close()
+	defer hardList.Destroy()
 	hardList.AppendList(nums)
 	hardList.BubbleSort()
 	return hardList.All()
@@ -449,7 +451,7 @@ func HardBubbleSorterValid(nums []int32) []int32 {
 // HardBubbleSorterValid 基于磁盘的归并排序
 func HardMergeSorter(nums []int32) {
 	hardList := DefaultHardList()
-	defer hardList.Close()
+	defer hardList.Destroy()
 	hardList.AppendList(nums)
 	hardList.MergeSort()
 }
@@ -457,7 +459,7 @@ func HardMergeSorter(nums []int32) {
 // HardBubbleSorterValid 测试基于磁盘的归并排序
 func HardMergeSorterValid(nums []int32) []int32 {
 	hardList := DefaultHardList()
-	defer hardList.Close()
+	defer hardList.Destroy()
 	hardList.AppendList(nums)
 	hardList.MergeSort()
 	return hardList.All()
