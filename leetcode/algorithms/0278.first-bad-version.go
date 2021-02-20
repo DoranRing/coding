@@ -2,17 +2,17 @@ package algorithms
 
 // 执行用时: 0 ms 内存消耗: 1.9 MB
 func firstBadVersion(n int) int {
-	l, r, ans := 0, n, -1
-	for l <= r {
+	l, r := 0, n
+	for l < r {
 		mid := (l + r) / 2
-		if isBadVersion(mid) {
-			ans = mid
-			r = mid - 1
-		} else {
+		if !isBadVersion(mid) {
 			l = mid + 1
+		} else {
+			r = mid
 		}
 	}
-	return ans
+
+	return l
 }
 
 func isBadVersion(version int) bool {
