@@ -35,7 +35,11 @@ func SelectSorter(nums []int) {
 // InsertSorter 插入排序(稳定排序)
 // time:O(n2), space:O(1)
 func InsertSorter(nums []int) {
-	for i := 1; i < len(nums); i++ {
+	insertSorter(nums, 0, len(nums)-1)
+}
+
+func insertSorter(nums []int, left, right int) {
+	for i := left + 1; i <= right; i++ {
 		for j := i; j > 0; j-- {
 			if nums[j] >= nums[j-1] {
 				break
@@ -66,49 +70,64 @@ func ShellSorter(nums []int) {
 	}
 }
 
-// MergeSorter 归并排序(稳定排序)
+// MergeSorterByRecursion 归并排序(稳定排序)
+// 使用递归方式
 // time:O(n*logN), space:O(n)
-func MergeSorter(nums []int) {
+func MergeSorterByRecursion(nums []int) {
 	if len(nums) <= 1 {
 		return
 	}
 	temp := make([]int, len(nums), len(nums))
-	mergeSorter(nums, temp, 0, len(nums)-1)
+	mergeSorterByRecursion(nums, temp, 0, len(nums)-1)
 }
 
-func mergeSorter(nums, temp []int, left, right int) {
-	if left == right {
-		// 一个元素
+func mergeSorterByRecursion(nums, temp []int, left, right int) {
+	if left >= right {
+		// 小于两个元素
 		return
-	} else if left+1 == right {
-		// 排序两个相邻元素
-		merge(nums, temp, left, right, right)
-	} else {
-		mid := (left + right) / 2
-		// 分治前半部分
-		mergeSorter(nums, temp, left, mid)
-		// 分支后半部分
-		mergeSorter(nums, temp, mid+1, right)
-		// 归并前、后半部分
-		merge(nums, temp, left, mid+1, right)
+	}
+	mid := (left + right) / 2
+	// 分治前半部分
+	mergeSorterByRecursion(nums, temp, left, mid)
+	// 分治后半部分
+	mergeSorterByRecursion(nums, temp, mid+1, right)
+	// 归并前、后半部分
+	merge(nums, temp, left, mid+1, right)
+}
+
+// MergeSorterByRecursion 归并排序(稳定排序)
+// 使用迭代方式
+// time:O(n*logN), space:O(n)
+func MergeSorterByLoop(nums []int) {
+	if len(nums) <= 1 {
+		return
+	}
+
+	temp := make([]int, len(nums), len(nums))
+	for step := 1; step < len(nums); step *= 2 {
+		for i := 0; i+step < len(nums); i += step * 2 {
+			r := i + step*2 - 1
+			if r >= len(nums)-1 {
+				r = len(nums) - 1
+			}
+			merge(nums, temp, i, i+step, r)
+		}
 	}
 }
 
 func merge(nums, temp []int, l1, l2, r2 int) {
-	idx := l1
-	for i, j := l1, l2; i < l2 || j <= r2; idx++ {
-		if i < l2 && j <= r2 {
-			if nums[i] < nums[j] {
-				temp[idx] = nums[i]
-				i++
-			} else {
-				temp[idx] = nums[j]
-				j++
-			}
-		} else if i < l2 {
+	i, j := l1, l2
+	for idx := l1; idx <= r2; idx++ {
+		if i >= l2 {
+			temp[idx] = nums[j]
+			j++
+		} else if j > r2 {
 			temp[idx] = nums[i]
 			i++
-		} else if j <= r2 {
+		} else if nums[i] < nums[j] {
+			temp[idx] = nums[i]
+			i++
+		} else {
 			temp[idx] = nums[j]
 			j++
 		}
@@ -118,43 +137,50 @@ func merge(nums, temp []int, l1, l2, r2 int) {
 	}
 }
 
-// QuickSorter 快速排序
+// QuickSorterByRecursion 快速排序
 // time:O(n*longN), space:O(1)
-func QuickSorter(nums []int) {
+func QuickSorterByRecursion(nums []int) {
 	if len(nums) <= 1 {
 		return
 	}
-	quickSorter(nums, 0, len(nums)-1)
+	quickSorterByRecursion(nums, 0, len(nums)-1)
 }
 
-func quickSorter(nums []int, left, right int) {
-	if left >= right {
+func quickSorterByRecursion(nums []int, left, right int) {
+	if left+10 >= right {
+		// 小数组切换到插入排序
+		insertSorter(nums, left, right)
 		return
 	}
+	idx := partition(nums, left, right)
+	quickSorterByRecursion(nums, left, idx-1)
+	quickSorterByRecursion(nums, idx+1, right)
+}
 
-	refVal, refIdx := nums[left], left
-	for i, j := 0, len(nums)-1; i <= j; {
-		// 小于值向前移动
-		for j >= refIdx && nums[j] >= refVal {
-			j--
-		}
-		if j >= refIdx {
-			nums[refIdx] = nums[j]
-			refIdx = j
-		}
-		// 大于值向后移动
-		for i <= refIdx && nums[i] <= refVal {
+func partition(nums []int, left, right int) int {
+	i, j, val := left, right+1, nums[left]
+	for true {
+		i++
+		for nums[i] <= val {
+			if i == right {
+				break
+			}
 			i++
 		}
-		if i <= refIdx {
-			nums[refIdx] = nums[i]
-			refIdx = i
+		j--
+		for val <= nums[j] {
+			if j == left {
+				break
+			}
+			j--
 		}
+		if i >= j {
+			break
+		}
+		nums[i], nums[j] = nums[j], nums[i]
 	}
-
-	nums[refIdx] = refVal
-	quickSorter(nums, left, refIdx-1)
-	quickSorter(nums, refIdx+1, right)
+	nums[left], nums[j] = nums[j], nums[left]
+	return j
 }
 
 // BucketSorter 桶排序(稳定排序)

@@ -124,25 +124,37 @@ func BenchmarkShellSorter(b *testing.B) {
 	}
 }
 
-func TestMergeSorter(t *testing.T) {
-	sortTest(t, MergeSorter, 1000, 1000*10)
+func TestMergeSorterByRecursion(t *testing.T) {
+	sortTest(t, MergeSorterByRecursion, 1000, 1000*10)
 }
 
 // 267570 ns/op
-func BenchmarkMergeSorter(b *testing.B) {
+func BenchmarkMergeSorterByRecursion(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		benchmarkTest(MergeSorter, 1000, 1000*10)
+		benchmarkTest(MergeSorterByRecursion, 1000, 1000*10)
 	}
 }
 
-func TestQuickSorter(t *testing.T) {
-	sortTest(t, QuickSorter, 1000, 1000*10)
+func TestMergeSorterByLoop(t *testing.T) {
+	sortTest(t, MergeSorterByLoop, 10, 10*10)
 }
 
-// 261440-1015922 ns/op
-func BenchmarkQuickSorter(b *testing.B) {
+// 263759 ns/op
+func BenchmarkMergeSorterByLoop(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		benchmarkTest(QuickSorter, 1000, 1000*10)
+		benchmarkTest(MergeSorterByLoop, 1000, 1000*10)
+	}
+}
+
+func TestQuickSorterByRecursion(t *testing.T) {
+	sortTest(t, QuickSorterByRecursion, 1000, 1000*10)
+}
+
+// 216657 ns/op
+// 小数组转换成InsertSort: 184113 ns/op
+func BenchmarkQuickSorterByRecursion(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		benchmarkTest(QuickSorterByRecursion, 1000, 1000*10)
 	}
 }
 
