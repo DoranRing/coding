@@ -38,23 +38,26 @@ func (a *ArrayStack) Pop() (int, error) {
 	if a.idx < 0 {
 		return 0, errors.New("stack empty")
 	}
+	if a.idx <= len(a.arr)/4 {
+		a.resize(len(a.arr))
+	}
 	val := a.arr[a.idx]
 	a.idx--
 	return val, nil
 }
 
 func (a *ArrayStack) Push(val int) {
-	a.grow()
+	if a.idx+1 >= len(a.arr) {
+		a.resize(len(a.arr) * 2)
+	}
 	a.arr[a.idx+1] = val
 	a.idx++
 }
 
-func (a *ArrayStack) grow() {
-	if a.idx >= len(a.arr)-1 {
-		newArr := make([]int, len(a.arr)*2)
-		copy(newArr, a.arr)
-		a.arr = newArr
-	}
+func (a *ArrayStack) resize(size int) {
+	newArr := make([]int, size)
+	copy(newArr, a.arr)
+	a.arr = newArr
 }
 
 type LinkedStack struct {
