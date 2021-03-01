@@ -6,7 +6,7 @@ import (
 )
 
 func Test_MinStack(t *testing.T) {
-	minStack := Constructor()
+	minStack := NewMinStack()
 	minStack.Push(85)
 	minStack.Push(-99)
 	minStack.Push(67)
