@@ -3,6 +3,14 @@ package algorithms
 import "testing"
 
 func Test_findKthLargestByHeap(t *testing.T) {
+	testFindKthLargest(t, findKthLargestByMaxHeap)
+}
+
+func Test_findKthLargestByMinHeap(t *testing.T) {
+	testFindKthLargest(t, findKthLargestByMinHeap)
+}
+
+func testFindKthLargest(t *testing.T, fn func([]int, int) int) {
 	type args struct {
 		nums []int
 		k    int
@@ -17,8 +25,8 @@ func Test_findKthLargestByHeap(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := findKthLargestByHeap(tt.args.nums, tt.args.k); got != tt.want {
-				t.Errorf("findKthLargestByHeap() = %v, want %v", got, tt.want)
+			if got := fn(tt.args.nums, tt.args.k); got != tt.want {
+				t.Errorf("actual %v, want %v", got, tt.want)
 			}
 		})
 	}
