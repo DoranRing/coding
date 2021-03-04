@@ -1,6 +1,9 @@
 package datastruct
 
-import "log"
+import (
+	"container/heap"
+	"log"
+)
 
 // Heap 堆
 type Heap interface {
@@ -133,32 +136,35 @@ func (s *SortedArrayHeap) Pop() int {
 	return val
 }
 
-// MaxBinaryHeap 二叉堆
-type MaxBinaryHeap struct {
+// MaxBinaryArrayHeap 二叉堆
+type MaxBinaryArrayHeap struct {
 
 	// 容器
 	slice []int
 }
 
-func NewMaxBinaryHeap() *MaxBinaryHeap {
-	return &MaxBinaryHeap{
+func NewMaxBinaryHeap() *MaxBinaryArrayHeap {
+	return &MaxBinaryArrayHeap{
 		slice: []int{0},
 	}
 }
 
-func (b *MaxBinaryHeap) Insert(num int) {
+func (b *MaxBinaryArrayHeap) Insert(num int) {
 	b.slice = append(b.slice, num)
 	b.up(len(b.slice) - 1)
 }
 
-func (b *MaxBinaryHeap) Top() int {
+func (b *MaxBinaryArrayHeap) Top() int {
 	if len(b.slice) <= 1 {
 		log.Fatalf("heap is empty")
 	}
 	return b.slice[1]
 }
 
-func (b *MaxBinaryHeap) Pop() int {
+// Pop 删除最大值
+// 1.存储顶点元素
+// 2.尾部元素设置为顶点元素，然后将顶点元素一直下沉
+func (b *MaxBinaryArrayHeap) Pop() int {
 	if len(b.slice) <= 1 {
 		log.Fatalf("heap is empty")
 	}
@@ -169,8 +175,11 @@ func (b *MaxBinaryHeap) Pop() int {
 	return val
 }
 
-// 节点下沉
-func (b *MaxBinaryHeap) down(k int) {
+// down 节点下沉
+// 1.获取两个子节点最大的节点A
+// 2.当前节点N的值小于最大子节点A则与之交换，然后继续下层最大子节点A
+// 3.当前节点N的值大于等于子节点A则不再继续
+func (b *MaxBinaryArrayHeap) down(k int) {
 	for k*2 < len(b.slice) {
 		max := k * 2
 		if max+1 < len(b.slice) && b.slice[max] < b.slice[max+1] {
@@ -184,10 +193,71 @@ func (b *MaxBinaryHeap) down(k int) {
 	}
 }
 
-// 节点上浮
-func (b *MaxBinaryHeap) up(k int) {
+// up 节点上浮
+// 1.当前节点N大于父节点P，则交换节点N-P，然后继续上浮节点P
+// 2.当前节点N小于或者登录父节点P则不再继续
+func (b *MaxBinaryArrayHeap) up(k int) {
 	for k > 1 && b.slice[(k/2)] < b.slice[k] {
 		b.slice[(k/2)], b.slice[k] = b.slice[k], b.slice[(k/2)]
 		k /= 2
 	}
+}
+
+// KthLargest kth大的元素
+// 使用最小堆，添加元素之后如果空间已满则删除堆顶的最小值
+type KthLargest struct {
+	arr []int
+
+	k int
+}
+
+func NewKthLargest(k int) *KthLargest {
+	return &KthLargest{k: k}
+}
+
+func (kl *KthLargest) Len() int {
+	return len(kl.arr)
+}
+
+func (kl *KthLargest) Less(i, j int) bool {
+	return kl.arr[i] < kl.arr[j]
+}
+
+func (kl *KthLargest) Swap(i, j int) {
+	kl.arr[i], kl.arr[j] = kl.arr[j], kl.arr[i]
+}
+
+// Push implement heap.Interface
+func (kl *KthLargest) Push(x interface{}) {
+	kl.arr = append(kl.arr, x.(int))
+}
+
+// Pop implement heap.Interface
+func (kl *KthLargest) Pop() interface{} {
+	val := kl.arr[kl.Len()-1]
+	kl.arr = kl.arr[:kl.Len()-1]
+	return val
+}
+
+// Insert 添加元素
+func (kl *KthLargest) Insert(val int) int {
+	if kl.Len() < kl.k || kl.arr[0] < val {
+		heap.Push(kl, val)
+		if kl.Len() > kl.k {
+			kl.Delete()
+		}
+	}
+	return kl.arr[0]
+}
+
+// InsertList 批量添加元素
+func (kl *KthLargest) InsertList(arr []int) {
+	for _, val := range arr {
+		kl.Insert(val)
+	}
+}
+
+// Delete 删除顶端的元素，即最小的值
+func (kl *KthLargest) Delete() int {
+	return heap.Pop(kl).(int)
 }

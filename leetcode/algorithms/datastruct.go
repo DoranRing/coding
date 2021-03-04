@@ -55,26 +55,56 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
-type IntHeap []int
+// MinIntHeap 最小堆
+type MinIntHeap []int
 
-func (h IntHeap) Len() int {
+func (h MinIntHeap) Len() int {
 	return len(h)
 }
 
-func (h IntHeap) Less(i, j int) bool {
+func (h MinIntHeap) Less(i, j int) bool {
 	return h[i] < h[j]
 }
 
-func (h IntHeap) Swap(i, j int) {
+func (h MinIntHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 }
 
-func (h *IntHeap) Push(x interface{}) {
+func (h *MinIntHeap) Push(x interface{}) {
 	*h = append(*h, x.(int))
 }
 
-func (h *IntHeap) Pop() interface{} {
+func (h *MinIntHeap) Pop() interface{} {
 	min := (*h)[len(*h)-1]
 	*h = (*h)[:len(*h)-1]
 	return min
+}
+
+// MaxIntHeap 最大堆
+type MaxIntHeap []int
+
+func (h MaxIntHeap) Len() int {
+	return len(h)
+}
+
+func (h MaxIntHeap) Less(i, j int) bool {
+	return h[i] > h[j]
+}
+
+func (h MaxIntHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+
+func (h *MaxIntHeap) Push(x interface{}) {
+	*h = append(*h, x.(int))
+}
+
+func (h *MaxIntHeap) Pop() interface{} {
+	min := (*h)[len(*h)-1]
+	*h = (*h)[:len(*h)-1]
+	return min
+}
+
+func (h *MaxIntHeap) Top() int {
+	return (*h)[0]
 }

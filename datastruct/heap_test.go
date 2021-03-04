@@ -2,6 +2,7 @@ package datastruct
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -84,4 +85,14 @@ func genIntNums(len, max int) []int {
 		res[i] = val
 	}
 	return res
+}
+
+func TestNewKthLargest(t *testing.T) {
+	k := 3
+	arr := []int{1, 3, 5, 7, 9, 2, 4, 6, 8, 10}
+	kthLargest := NewKthLargest(k)
+	kthLargest.InsertList(arr)
+	for i := 0; i < k; i++ {
+		log.Printf("%d\n", kthLargest.Delete())
+	}
 }
