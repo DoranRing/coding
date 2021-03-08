@@ -12,7 +12,6 @@ func Test_strStrByTwoPoint(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
 		{"1", args{"hello", "ll"}, 2},
 		{"2", args{"aaaaa", "bba"}, -1},
 		{"3", args{"", ""}, 0},

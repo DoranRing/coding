@@ -11,7 +11,6 @@ func Test_myAtoi(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
 		{"1", args{"42"}, 42},
 		{"2", args{"   -42"}, -42},
 		{"3", args{"4193 with words"}, 4193},

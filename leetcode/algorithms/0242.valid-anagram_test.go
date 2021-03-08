@@ -12,7 +12,6 @@ func Test_isAnagramBySort(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
 		{"1", args{"anagram", "nagaram"}, true},
 		{"2", args{"rat", "car"}, false},
 	}
@@ -35,7 +34,6 @@ func Test_isAnagramByHash(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
 		{"1", args{"anagram", "nagaram"}, true},
 		{"2", args{"rat", "car"}, false},
 	}
@@ -58,7 +56,6 @@ func Test_isAnagramByArray(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
 		{"1", args{"anagram", "nagaram"}, true},
 		{"2", args{"rat", "car"}, false},
 	}

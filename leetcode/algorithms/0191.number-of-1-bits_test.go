@@ -11,7 +11,6 @@ func Test_hammingWeight(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
 		{"1", args{0b00000000000000000000000000001011}, 3},
 		{"2", args{0b00000000000000000000000010000000}, 1},
 		{"3", args{0b11111111111111111111111111111101}, 31},

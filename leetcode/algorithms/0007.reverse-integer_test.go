@@ -11,7 +11,6 @@ func Test_reverseByMath(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
 		{"1", args{123}, 321},
 		{"2", args{-123}, -321},
 		{"3", args{120}, 21},

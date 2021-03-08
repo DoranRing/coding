@@ -11,7 +11,6 @@ func Test_longestCommonPrefix(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		{"1", args{[]string{"dog", "racecar", "car"}}, ""},
 		{"2", args{[]string{"dog", "", "dar"}}, ""},
 	}

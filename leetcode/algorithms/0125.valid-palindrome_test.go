@@ -11,7 +11,6 @@ func Test_isPalindromeByTwoPoint(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
 		{"1", args{"A man, a plan, a canal: Panama"}, true},
 		{"2", args{"race a car"}, false},
 	}

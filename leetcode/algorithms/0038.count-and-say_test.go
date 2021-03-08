@@ -11,7 +11,6 @@ func Test_countAndSay(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
 		{"1", args{1}, "1"},
 		{"2", args{2}, "11"},
 		{"3", args{3}, "21"},
