@@ -2,6 +2,39 @@ package algorithms
 
 import "testing"
 
+func TestNonSortedListTable(t *testing.T) {
+	table := &NonSortedListTable{}
+	testTable(t, table)
+}
+
+func TestSortedArrayTable(t *testing.T) {
+	table := &SortedArrayTable{}
+	testTable(t, table)
+}
+
+func TestBinaryTreeTable(t *testing.T) {
+	table := &BinaryTreeTable{}
+	testTable(t, table)
+}
+
+func testTable(t *testing.T, table Table) {
+	data := make(map[string]string)
+	data["three"] = "threeValue"
+	data["two"] = "twoValue"
+	data["one"] = "oneValue"
+	for k, v := range data {
+		table.Set(k, v)
+	}
+	table.Set("one", "changedOneValue")
+
+	if val, ok := table.Get("one"); !ok || val != "changedOneValue" {
+		t.Errorf("testTable want: %s, actual: %s\n", "changedOneValue", val)
+	}
+	if _, ok := table.Get("four"); ok {
+		t.Errorf("testTable want: %s, actual: %t\n", "false", ok)
+	}
+}
+
 func TestBinarySearch(t *testing.T) {
 	type args struct {
 		sortNums []int
