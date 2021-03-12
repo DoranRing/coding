@@ -1,6 +1,9 @@
 package datastruct
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestArrayList_Size(t *testing.T) {
 	list := NewArrayList()
@@ -165,5 +168,95 @@ func TestDoubleLinkedList_Remove(t *testing.T) {
 	}
 	if val != 40 {
 		t.Errorf("actual %d, want %d", val, 40)
+	}
+}
+
+func TestRecursionLinkedListReverser_Reverse(t *testing.T) {
+	testLinkedListReverser(t, RecursionLinkedListReverser{})
+}
+
+func TestRecursionLinkedListReverser_ReverseRange(t *testing.T) {
+	testLinkedListReverseRange(t, RecursionLinkedListReverser{})
+}
+
+func TestHeadInsertLinkedListReverser_Reverse(t *testing.T) {
+	testLinkedListReverser(t, HeadInsertLinkedListReverser{})
+}
+
+func TestHeadInsertLinkedListReverser_ReverseRange(t *testing.T) {
+	testLinkedListReverseRange(t, HeadInsertLinkedListReverser{})
+}
+
+func testLinkedListReverser(t *testing.T, reverser LinkedListReverser) {
+	type args struct {
+		head *LinkedListNode
+	}
+	tests := []struct {
+		name string
+		args args
+		want *LinkedListNode
+	}{
+		{
+			"1",
+			args{
+				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+			},
+			GenLinkedListNode([]int{5, 4, 3, 2, 1}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := reverser.Reverse(tt.args.head); !got.DepthEqual(tt.want) {
+				t.Errorf("Reverse() result false\n")
+			}
+		})
+	}
+}
+
+func testLinkedListReverseRange(t *testing.T, reverser LinkedListReverser) {
+	type args struct {
+		head *LinkedListNode
+		m    int
+		n    int
+	}
+	tests := []struct {
+		name string
+		args args
+		want *LinkedListNode
+	}{
+		{
+			"1",
+			args{
+				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				m:    0,
+				n:    2,
+			},
+			GenLinkedListNode([]int{3, 2, 1, 4, 5}),
+		},
+		{
+			"2",
+			args{
+				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				m:    1,
+				n:    3,
+			},
+			GenLinkedListNode([]int{1, 4, 3, 2, 5}),
+		},
+		{
+			"3",
+			args{
+				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				m:    2,
+				n:    4,
+			},
+			GenLinkedListNode([]int{1, 2, 5, 4, 3}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := reverser.ReverseRange(tt.args.head, tt.args.m, tt.args.n); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ReverseRange() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }

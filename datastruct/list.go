@@ -104,11 +104,58 @@ func (a *ArrayList) grow() {
 	}
 }
 
+// LinkedListNode 单向链式线性表的节点
+type LinkedListNode struct {
+	val  int
+	next *LinkedListNode
+}
+
+// NewLinkedListNode 创建链式线性表节点
+func NewLinkedListNode(val int) *LinkedListNode {
+	return &LinkedListNode{val: val}
+}
+
+// GenLinkedListNode 根据输入数组创建链式线性表节点
+func GenLinkedListNode(nums []int) *LinkedListNode {
+	var head, cur *LinkedListNode
+	for _, num := range nums {
+		node := NewLinkedListNode(num)
+		if cur == nil {
+			head = node
+			cur = node
+		} else {
+			cur.next = node
+			cur = cur.next
+		}
+	}
+	return head
+}
+
+func (n *LinkedListNode) DepthEqual(head *LinkedListNode) bool {
+	if n == nil && head == nil {
+		return true
+	}
+	if n != nil && head == nil {
+		return false
+	}
+	if n == nil && head != nil {
+		return false
+	}
+	cur, otherCur := n, head
+	for cur != nil && otherCur != nil {
+		if cur.val != otherCur.val {
+			return false
+		}
+		cur, otherCur = cur.next, otherCur.next
+	}
+	return cur == nil && otherCur == nil
+}
+
 // LinkedList 单向链式线性表
 type LinkedList struct {
 	len  int
-	head *node
-	last *node
+	head *LinkedListNode
+	last *LinkedListNode
 }
 
 func NewLinkedList() *LinkedList {
@@ -139,7 +186,7 @@ func (l *LinkedList) Contains(val int) bool {
 }
 
 func (l *LinkedList) Add(val int) {
-	n := &node{val: val}
+	n := &LinkedListNode{val: val}
 	if l.last != nil {
 		l.last.next = n
 		l.last = l.last.next
@@ -193,16 +240,23 @@ func (l *LinkedList) Get(idx int) (int, error) {
 	return cur.val, nil
 }
 
-type node struct {
+// DoubleLinkedListNode 双向链式线性表的节点
+type DoubleLinkedListNode struct {
 	val  int
-	next *node
+	pre  *DoubleLinkedListNode
+	next *DoubleLinkedListNode
+}
+
+// NewDoubleLinkedList 创建双向链式线性表的节点
+func NewDoubleLinkedList() *DoubleLinkedList {
+	return &DoubleLinkedList{}
 }
 
 // DoubleLinkedList 双向链式线性表
 type DoubleLinkedList struct {
 	len  int
-	head *doubleNode
-	last *doubleNode
+	head *DoubleLinkedListNode
+	last *DoubleLinkedListNode
 }
 
 func (d *DoubleLinkedList) Size() int {
@@ -229,7 +283,7 @@ func (d *DoubleLinkedList) Contains(val int) bool {
 }
 
 func (d *DoubleLinkedList) Add(val int) {
-	n := &doubleNode{val: val}
+	n := &DoubleLinkedListNode{val: val}
 	if d.last == nil {
 		d.head, d.last = n, n
 	} else {
@@ -267,7 +321,7 @@ func (d *DoubleLinkedList) Get(idx int) (int, error) {
 	return d.match(idx).val, nil
 }
 
-func (d *DoubleLinkedList) match(idx int) *doubleNode {
+func (d *DoubleLinkedList) match(idx int) *DoubleLinkedListNode {
 	half := idx >= d.len/2
 	// 大于一半，从尾部开始
 	if half {
@@ -285,12 +339,94 @@ func (d *DoubleLinkedList) match(idx int) *doubleNode {
 	return cur
 }
 
-func NewDoubleLinkedList() *DoubleLinkedList {
-	return &DoubleLinkedList{}
+type LinkedListReverser interface {
+
+	// 翻转整个链表
+	Reverse(head *LinkedListNode) *LinkedListNode
+
+	// 翻转区间
+	ReverseRange(head *LinkedListNode, m, n int) *LinkedListNode
 }
 
-type doubleNode struct {
-	val  int
-	pre  *doubleNode
-	next *doubleNode
+// RecursionLinkedListReverser 基于递归的单链表翻转
+type RecursionLinkedListReverser struct {
+}
+
+func (r RecursionLinkedListReverser) Reverse(head *LinkedListNode) *LinkedListNode {
+	if head == nil || head.next == nil {
+		return head
+	}
+	newHead := r.Reverse(head.next)
+	head.next.next = head
+	head.next = nil
+	return newHead
+}
+
+func (r RecursionLinkedListReverser) ReverseRange(head *LinkedListNode, m, n int) *LinkedListNode {
+	pre := &LinkedListNode{next: head}
+	for i := 0; i < m; i++ {
+		pre = pre.next
+	}
+	cur := pre.next
+	rangeHead, rangeNext := r.reverseRange(cur, n-m)
+	cur.next = rangeNext
+	pre.next = rangeHead
+
+	if m == 0 {
+		return rangeHead
+	}
+	return head
+}
+
+func (r RecursionLinkedListReverser) reverseRange(node *LinkedListNode, n int) (*LinkedListNode, *LinkedListNode) {
+	if n == 0 {
+		return node, node.next
+	}
+	newHead, rangeNext := r.reverseRange(node.next, n-1)
+	node.next.next = node
+	node.next = nil
+	return newHead, rangeNext
+}
+
+// HeadInsertLinkedListReverser 头插法的单链表翻转
+type HeadInsertLinkedListReverser struct {
+}
+
+func (h HeadInsertLinkedListReverser) Reverse(head *LinkedListNode) *LinkedListNode {
+	var newHead *LinkedListNode
+	for head != nil {
+		next := head.next
+		// move new
+		head.next = newHead
+		newHead = head
+		head = next
+	}
+
+	return newHead
+}
+
+func (h HeadInsertLinkedListReverser) ReverseRange(head *LinkedListNode, m, n int) *LinkedListNode {
+	if m == 0 {
+		return h.reverseRange(head, n-m)
+	}
+
+	pre := head
+	for i := 1; i < m; i++ {
+		pre = pre.next
+	}
+	pre.next = h.reverseRange(pre.next, n-m)
+	return head
+}
+
+func (h *HeadInsertLinkedListReverser) reverseRange(node *LinkedListNode, n int) *LinkedListNode {
+	var head, last *LinkedListNode = nil, node
+	for i := 0; i <= n; i++ {
+		next := node.next
+		node.next = head
+		head = node
+		node = next
+	}
+	// link last next
+	last.next = node
+	return head
 }
