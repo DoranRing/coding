@@ -17,11 +17,11 @@ func Test_mergeKLists(t *testing.T) {
 		{
 			"1",
 			args{[]*ListNode{
-				genListNode([]int{1, 4, 5}),
-				genListNode([]int{1, 3, 4}),
-				genListNode([]int{2, 6}),
+				GenListNode([]int{1, 4, 5}),
+				GenListNode([]int{1, 3, 4}),
+				GenListNode([]int{2, 6}),
 			}},
-			genListNode([]int{1, 1, 2, 3, 4, 4, 5, 6}),
+			GenListNode([]int{1, 1, 2, 3, 4, 4, 5, 6}),
 		},
 		{"2", args{[]*ListNode{}}, nil},
 	}

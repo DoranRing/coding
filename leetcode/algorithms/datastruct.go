@@ -6,7 +6,7 @@ type ListNode struct {
 	Next *ListNode
 }
 
-func genListNode(input []int) *ListNode {
+func GenListNode(input []int) *ListNode {
 	var head, cur *ListNode
 	for _, val := range input {
 		if cur == nil {
@@ -21,7 +21,7 @@ func genListNode(input []int) *ListNode {
 	return head
 }
 
-func listNodeEqual(input1, input2 *ListNode) bool {
+func ListNodeEqual(input1, input2 *ListNode) bool {
 	if input1 == nil && input2 == nil {
 		return true
 	}

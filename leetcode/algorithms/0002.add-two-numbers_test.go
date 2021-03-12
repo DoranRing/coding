@@ -17,31 +17,31 @@ func Test_addTwoNumbers(t *testing.T) {
 		{
 			"1",
 			args{
-				genListNode([]int{2, 4, 3}),
-				genListNode([]int{5, 6, 4}),
+				GenListNode([]int{2, 4, 3}),
+				GenListNode([]int{5, 6, 4}),
 			},
-			genListNode([]int{7, 0, 8}),
+			GenListNode([]int{7, 0, 8}),
 		},
 		{
 			"2",
 			args{
-				genListNode([]int{0}),
-				genListNode([]int{0}),
+				GenListNode([]int{0}),
+				GenListNode([]int{0}),
 			},
-			genListNode([]int{0}),
+			GenListNode([]int{0}),
 		},
 		{
 			"3",
 			args{
-				genListNode([]int{9, 9, 9, 9, 9, 9, 9}),
-				genListNode([]int{9, 9, 9, 9}),
+				GenListNode([]int{9, 9, 9, 9, 9, 9, 9}),
+				GenListNode([]int{9, 9, 9, 9}),
 			},
-			genListNode([]int{8, 9, 9, 9, 0, 0, 0, 1}),
+			GenListNode([]int{8, 9, 9, 9, 0, 0, 0, 1}),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := addTwoNumbers(tt.args.l1, tt.args.l2); !listNodeEqual(got, tt.want) {
+			if got := addTwoNumbers(tt.args.l1, tt.args.l2); !ListNodeEqual(got, tt.want) {
 				t.Errorf("addTwoNumbers() = %v, want %v", got, tt.want)
 			}
 		})
