@@ -115,8 +115,8 @@ func NewLinkedListNode(val int) *LinkedListNode {
 	return &LinkedListNode{val: val}
 }
 
-// GenLinkedListNode 根据输入数组创建链式线性表节点
-func GenLinkedListNode(nums []int) *LinkedListNode {
+// GenLinkedListNodeByLastInsert 使用尾插方式根据输入数组创建链式线性表节点
+func GenLinkedListNodeByLastInsert(nums []int) *LinkedListNode {
 	var head, cur *LinkedListNode
 	for _, num := range nums {
 		node := NewLinkedListNode(num)
@@ -127,6 +127,17 @@ func GenLinkedListNode(nums []int) *LinkedListNode {
 			cur.next = node
 			cur = cur.next
 		}
+	}
+	return head
+}
+
+// GenLinkedListNodeByHeadInsert 使用头插方式根据输入数组创建链式线性表节点
+func GenLinkedListNodeByHeadInsert(nums []int) *LinkedListNode {
+	var head *LinkedListNode
+	for _, num := range nums {
+		node := NewLinkedListNode(num)
+		node.next = head
+		head = node
 	}
 	return head
 }

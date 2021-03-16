@@ -61,7 +61,7 @@ func (a *ArrayStack) resize(size int) {
 }
 
 type LinkedStack struct {
-	head *node
+	head *LinkedListNode
 }
 
 func NewLinkedStack() *LinkedStack {
@@ -85,7 +85,7 @@ func (l *LinkedStack) Pop() (int, error) {
 }
 
 func (l *LinkedStack) Push(val int) {
-	n := &node{val: val}
+	n := &LinkedListNode{val: val}
 	if l.head == nil {
 		l.head = n
 	} else {

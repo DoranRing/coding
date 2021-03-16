@@ -199,9 +199,9 @@ func testLinkedListReverser(t *testing.T, reverser LinkedListReverser) {
 		{
 			"1",
 			args{
-				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				head: GenLinkedListNodeByLastInsert([]int{1, 2, 3, 4, 5}),
 			},
-			GenLinkedListNode([]int{5, 4, 3, 2, 1}),
+			GenLinkedListNodeByLastInsert([]int{5, 4, 3, 2, 1}),
 		},
 	}
 	for _, tt := range tests {
@@ -227,35 +227,55 @@ func testLinkedListReverseRange(t *testing.T, reverser LinkedListReverser) {
 		{
 			"1",
 			args{
-				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				head: GenLinkedListNodeByLastInsert([]int{1, 2, 3, 4, 5}),
 				m:    0,
 				n:    2,
 			},
-			GenLinkedListNode([]int{3, 2, 1, 4, 5}),
+			GenLinkedListNodeByLastInsert([]int{3, 2, 1, 4, 5}),
 		},
 		{
 			"2",
 			args{
-				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				head: GenLinkedListNodeByLastInsert([]int{1, 2, 3, 4, 5}),
 				m:    1,
 				n:    3,
 			},
-			GenLinkedListNode([]int{1, 4, 3, 2, 5}),
+			GenLinkedListNodeByLastInsert([]int{1, 4, 3, 2, 5}),
 		},
 		{
 			"3",
 			args{
-				head: GenLinkedListNode([]int{1, 2, 3, 4, 5}),
+				head: GenLinkedListNodeByLastInsert([]int{1, 2, 3, 4, 5}),
 				m:    2,
 				n:    4,
 			},
-			GenLinkedListNode([]int{1, 2, 5, 4, 3}),
+			GenLinkedListNodeByLastInsert([]int{1, 2, 5, 4, 3}),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := reverser.ReverseRange(tt.args.head, tt.args.m, tt.args.n); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ReverseRange() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenLinkedListNodeByHeadInsert(t *testing.T) {
+	type args struct {
+		nums []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want *LinkedListNode
+	}{
+		{"1", args{nums: []int{5, 4, 3, 2, 1}}, GenLinkedListNodeByLastInsert([]int{1, 2, 3, 4, 5})},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GenLinkedListNodeByHeadInsert(tt.args.nums); !got.DepthEqual(tt.want) {
+				t.Errorf("GenLinkedListNodeByHeadInsert() = %v, want %v", got, tt.want)
 			}
 		})
 	}

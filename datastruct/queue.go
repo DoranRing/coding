@@ -15,8 +15,8 @@ type Queue interface {
 }
 
 type LinkedQueue struct {
-	head *node
-	last *node
+	head *LinkedListNode
+	last *LinkedListNode
 }
 
 func (l *LinkedQueue) Top() (int, error) {
@@ -36,7 +36,7 @@ func (l *LinkedQueue) Dequeue() (int, error) {
 }
 
 func (l *LinkedQueue) Enqueue(val int) {
-	n := &node{val: val}
+	n := &LinkedListNode{val: val}
 	if l.head == nil {
 		l.head = n
 		l.last = n
